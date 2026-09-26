@@ -43,7 +43,6 @@ class _RootNavState extends State<RootNav> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        top: false,
         child: IndexedStack(index: _idx, children: _pages),
       ),
       bottomNavigationBar: BottomNavigationBar(
