@@ -40,11 +40,13 @@ class _ReaderScreenState extends State<ReaderScreen> {
   String? _chapterLabel;
   Timer? _saveDeb;
   late LibraryStore _store;
+  late DateTime _t0;
 
   @override
   void initState() {
     super.initState();
     _store = context.read<LibraryStore>();
+    _t0 = DateTime.now();
     _pages = _load();
     _positions.itemPositions.addListener(_onPos);
   }
@@ -85,6 +87,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
     if (_total > 0 && first >= _total) first = _total - 1;
     if (first != _current) {
       setState(() => _current = first);
+      _store.recordPage();
+      // Reached the final page — count the chapter as read.
+      if (_total > 0 && first >= _total - 1) {
+        _store.recordChapter(widget.chapterId);
+      }
       _saveDeb?.cancel();
       _saveDeb = Timer(const Duration(seconds: 1), _persist);
     }
@@ -106,6 +113,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
   void dispose() {
     _saveDeb?.cancel();
     _persist();
+    _store.addReadSeconds(DateTime.now().difference(_t0).inSeconds);
+    // Got at least 80% through — count the chapter as read.
+    if (_total > 0 && _current + 1 >= (_total * 0.8).ceil()) {
+      _store.recordChapter(widget.chapterId);
+    }
     super.dispose();
   }
 

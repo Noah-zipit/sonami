@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import '../api.dart';
 import '../store.dart';
 import '../theme.dart';
+import '../widgets/continue_reading.dart';
+import 'about_screen.dart';
 import 'detail_screen.dart';
-import 'reader_screen.dart';
+import 'stats_screen.dart';
 
 const _shelves = [
   ('reading', 'Reading'),
@@ -40,11 +42,27 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
     final store = context.watch<LibraryStore>();
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 18, 16, 4),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text('My library', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
+          child: Row(
+            children: [
+              const Expanded(
+                child: Text('My library',
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+              ),
+              IconButton(
+                tooltip: 'Reading stats',
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const StatsScreen())),
+                icon: const Icon(Icons.bar_chart_outlined, color: SonamiTheme.muted),
+              ),
+              IconButton(
+                tooltip: 'About Sonami',
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const AboutScreen())),
+                icon: const Icon(Icons.info_outline, color: SonamiTheme.muted),
+              ),
+            ],
           ),
         ),
         if (store.ready && store.recentProgress().isNotEmpty) ...[
@@ -57,45 +75,14 @@ class _LibraryScreenState extends State<LibraryScreen> with SingleTickerProvider
             ),
           ),
           SizedBox(
-            height: 92,
+            height: 196,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: store.recentProgress().length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (_, i) {
-                final e = store.recentProgress()[i];
-                final p = e.value as Map;
-                return GestureDetector(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => ReaderScreen(
-                      mangaId: p['mangaId'].toString(),
-                      chapterId: p['chapterId'].toString(),
-                      resumePage: (p['page'] as num?)?.toInt() ?? 0,
-                    ),
-                  )),
-                  child: Container(
-                    width: 220,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: SonamiTheme.card,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: SonamiTheme.line),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text((p['mangaTitle'] ?? '').toString(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
-                        const SizedBox(height: 3),
-                        Text('Ch. ${p['chapter'] ?? '?'} · page ${((p['page'] as num?)?.toInt() ?? 0) + 1}',
-                            style: const TextStyle(color: SonamiTheme.accent, fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                );
-              },
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (_, i) =>
+                  ContinueReadingCard(progress: store.recentProgress()[i].value as Map),
             ),
           ),
         ],

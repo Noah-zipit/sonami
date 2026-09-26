@@ -4,9 +4,9 @@ import '../api.dart';
 import '../models.dart';
 import '../store.dart';
 import '../theme.dart';
+import '../widgets/continue_reading.dart';
 import '../widgets/manga_card.dart';
 import 'detail_screen.dart';
-import 'reader_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -66,44 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: recent.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (_, i) {
-                  final p = recent[i].value as Map;
-                  return GestureDetector(
-                    onTap: () {
-                      final mangaId = p['mangaId'].toString();
-                      final chapterId = p['chapterId'].toString();
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (_) => ReaderScreen(mangaId: mangaId, chapterId: chapterId, resumePage: (p['page'] as num?)?.toInt() ?? 0),
-                      ));
-                    },
-                    child: SizedBox(
-                      width: 250,
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text((p['mangaTitle'] ?? '').toString(), maxLines: 2, overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                              const SizedBox(height: 4),
-                              Text('Ch. ${p['chapter'] ?? '?'} · page ${((p['page'] as num?)?.toInt() ?? 0) + 1}',
-                                  style: const TextStyle(color: SonamiTheme.muted, fontSize: 12)),
-                              const Spacer(),
-                              const Row(
-                                children: [
-                                  Icon(Icons.play_circle_fill, color: SonamiTheme.accent, size: 20),
-                                  SizedBox(width: 6),
-                                  Text('Resume', style: TextStyle(color: SonamiTheme.accent, fontWeight: FontWeight.w700, fontSize: 13)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
+                itemBuilder: (_, i) => ContinueReadingCard(progress: recent[i].value as Map),
               ),
             ),
           ],
