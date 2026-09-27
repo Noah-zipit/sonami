@@ -25,7 +25,7 @@
 
 ## 📲 Install
 
-Grab the APK from the [**latest release**](https://github.com/Noah-zipit/sonami-flutter/releases/latest):
+Grab the APK from the [**latest release**](https://github.com/Noah-zipit/sonami/releases/latest):
 
 | APK | For |
 |---|---|
